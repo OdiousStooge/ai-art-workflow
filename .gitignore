@@ -129,6 +129,7 @@ dmypy.json
 *.png
 *.gif
 *.mp4
+*.mp3
 
 # Ignore ShotCut files
 *.mlt

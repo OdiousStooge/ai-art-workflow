@@ -23,8 +23,7 @@ def download_and_convert_to_mp3(url, output_path):
 
 
 # Example usage
-# url = "https://www.youtube.com/watch?v=9FWQmpn4oZ0&t=66s&ab_channel=DungeonSynth"
-url = "https://www.youtube.com/watch?v=Eh9sFlQm51Q&ab_channel=TheDungeonSynthArchives"
+url = "https://www.youtube.com/CHANGE_ME"  # TODO: add a valid YouTube URL - be sure to check the video's license before downloading
 output_path = "./output"
 mp3_file = download_and_convert_to_mp3(url, output_path)
 print(f"MP3 file saved as: {mp3_file}")
