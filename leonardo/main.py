@@ -18,13 +18,16 @@ logging.basicConfig(
 load_dotenv()
 
 # Constants
+# TODO: Set the range of prompts to generate Start and End inclusive corresponds to ids in prompts.db
 START = 1  # start of the range
 END = 6  # end of the range (inclusive)
 PROMPT_ID = list(range(START, END + 1))
+# TODO: Set the core theme that will be concatenated to each prompt
 CORE_THEME = """
 in the style of [add core theme prompt here]
 """  # noqa
 
+# TODO: Set to True to run in realism mode (photo real) False to run in magick mode (stylized)
 RUN_REALISM = False
 
 # Set up database connection

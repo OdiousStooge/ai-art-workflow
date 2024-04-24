@@ -43,10 +43,5 @@ def convert_and_crop_landscape_to_portrait(input_folder, output_folder):
             print(f"Error converting {filename}: {e}")
 
 
-# Example usage:
-# Make sure to replace 'path/to/input_folder' and 'path/to/output_folder' with your actual folder paths
-# convert_and_crop_landscape_to_portrait('path/to/input_folder', 'path/to/output_folder')
-
-
 # Example usage
 convert_and_crop_landscape_to_portrait("tok_input/", "tok_output/")
