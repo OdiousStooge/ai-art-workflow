@@ -166,3 +166,7 @@ _scratch/
 *.db
 
 .env
+
+# Data folder except .gitkeep
+data/*
+!data/.gitkeep

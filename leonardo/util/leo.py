@@ -10,6 +10,7 @@ STANDARD_HEADERS = headers = {
     "authorization": f"Bearer {LEONARDO_API}",
 }
 GENERATIONS_URL = "https://cloud.leonardo.ai/api/rest/v1/generations"
+USER_INFO_URL = "https://cloud.leonardo.ai/api/rest/v1/me"
 MODEL_IDS = [
     "aa77f04e-3eec-4034-9c07-d0f619684628",
     # "5c232a9e-9061-4777-980a-ddc8e65647c6",
@@ -172,3 +173,20 @@ def leo_magick(prompt, core_theme=None, negative_prompt=NEGATIVE_PROMPT):
     logging.info("Finished Magick")
 
     return output_images
+
+
+def leo_get_user_info():
+    logging.info(f"Getting user info from {USER_INFO_URL}")
+    response_data = leo_get(USER_INFO_URL)
+    logging.info(f"Received user info data {response_data}")
+
+    return response_data
+
+
+def leo_get_user_generations(user_id, offset=0, limit=200):
+    url = f"https://cloud.leonardo.ai/api/rest/v1/generations/user/{user_id}?offset={offset}&limit={limit}"
+    logging.info(f"Getting user generations from {url}")
+    response_data = leo_get(url)
+    logging.info(f"Received user generations data {response_data}")
+
+    return response_data
