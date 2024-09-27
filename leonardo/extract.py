@@ -112,7 +112,8 @@ if __name__ == "__main__":
 
         # Fetch user generations using leo_get_user_generations if user_id is found
         user_generations_response = leo_get_user_generations(user_id)
-        user_generations = json.loads(user_generations_response)
+        # user_generations = json.loads(user_generations_response)
+        user_generations = user_generations_response
 
         # Define the path to save the user generations info
         user_generations_path = "data/userGenerations.json"
@@ -142,7 +143,7 @@ if __name__ == "__main__":
     save_json_to_file(user_info, user_info_path)
 
     # Define the folder path for extracting IDs
-    folder_path = "../image-fix/output/"
+    folder_path = "../image-fix/input/"
 
     # Extract IDs from filenames
     files_info = extract_ids_from_filenames(folder_path)

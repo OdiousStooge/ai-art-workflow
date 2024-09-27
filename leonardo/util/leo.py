@@ -183,10 +183,29 @@ def leo_get_user_info():
     return response_data
 
 
-def leo_get_user_generations(user_id, offset=0, limit=200):
-    url = f"https://cloud.leonardo.ai/api/rest/v1/generations/user/{user_id}?offset={offset}&limit={limit}"
-    logging.info(f"Getting user generations from {url}")
-    response_data = leo_get(url)
-    logging.info(f"Received user generations data {response_data}")
+def leo_get_user_generations(user_id, offset=0, limit=800):
+    url_template = "https://cloud.leonardo.ai/api/rest/v1/generations/user/{user_id}?offset={offset}&limit={chunk_size}"
+    chunk_size = 50
+    combined_generations = []
 
-    return response_data
+    while offset < limit:
+        url = url_template.format(user_id=user_id, offset=offset, chunk_size=chunk_size)
+        logging.info(f"Getting user generations from {url}")
+        response_data = leo_get(url)
+        # Parse response data
+        response_data = json.loads(response_data)
+
+        if not isinstance(response_data, dict):
+            logging.error(f"Invalid response data received: {response_data}")
+            break
+
+        generations = response_data.get("generations", [])
+        combined_generations.extend(generations)
+
+        if len(generations) < chunk_size:
+            # No more data to fetch
+            break
+
+        offset += chunk_size
+
+    return {"generations": combined_generations}
