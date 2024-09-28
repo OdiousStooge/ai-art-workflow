@@ -4,6 +4,7 @@ import json
 from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
 from util.leo import leo_get_user_info, leo_get_user_generations
+from fuzzywuzzy import fuzz
 
 
 """
@@ -25,6 +26,70 @@ def extract_ids_from_filenames(folder_path):
             files_info.append(
                 {"file_path": file_path, "file_name": filename, "file_id": file_id}
             )
+    return files_info
+
+
+from fuzzywuzzy import fuzz
+
+
+def fuzzy_match_names(files_info, upscaled_images):
+    matches = []
+
+    for file_info in files_info:
+        file_namestring = file_info["file_namestring"]
+
+        for img in upscaled_images:
+            # Extract a substring from the prompt based on the length of the file_namestring
+            prompt_substring = img["prompt"][: len(file_namestring)].strip()
+
+            # Use fuzzy matching to compare the file_namestring with the prompt substring
+            match_score = fuzz.ratio(file_namestring.lower(), prompt_substring.lower())
+
+            # If the match score is at least 80%, consider it a match
+            if match_score >= 80:
+                matches.append(
+                    {
+                        "file_path": file_info["file_path"],
+                        "file_name": file_info["file_name"],
+                        "file_namestring": file_namestring,
+                        "upscaled_id": img["upscaled_id"],
+                        "generated_image_id": img["generated_image_id"],
+                        "prompt": img["prompt"],
+                        "negativePrompt": img["negativePrompt"],
+                        "match_score": match_score,  # Include the match score for reference
+                    }
+                )
+
+    return matches
+
+
+def extract_name_string_from_filenames(folder_path, ignore_strings):
+    files_info = []
+
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+
+        # Remove the file extension
+        name_without_extension = os.path.splitext(filename)[0]
+
+        # Remove ignore strings from the filename
+        for ignore_string in ignore_strings:
+            name_without_extension = name_without_extension.replace(ignore_string, "")
+
+        # Replace underscores with spaces
+        name_string = name_without_extension.replace("_", " ")
+
+        # Remove trailing numbers (e.g., _0, _1, etc.)
+        name_string = re.sub(r"\s*\d+$", "", name_string).strip()
+
+        # Add the extracted information to the list
+        files_info.append(
+            {
+                "file_path": file_path,
+                "file_name": filename,
+                "file_namestring": name_string,
+            }
+        )
     return files_info
 
 
@@ -146,20 +211,30 @@ if __name__ == "__main__":
     folder_path = "../image-fix/input/"
 
     # Extract IDs from filenames
-    files_info = extract_ids_from_filenames(folder_path)
+    # files_info = extract_ids_from_filenames(folder_path)
+    files_info = extract_name_string_from_filenames(
+        folder_path, ["Leonardo_Kino_XL", "PhotoReal"]
+    )
 
     # Print extracted IDs and their count
-    extracted_ids = [file["file_id"] for file in files_info]
+    # extracted_ids = [file["file_id"] for file in files_info]
+    matched_images = fuzzy_match_names(files_info, upscaled_images)
+    print(
+        f"Matched {len(matched_images)} fuzzy matches from the file names and prompts"
+    )
+
+    for match in matched_images:
+        update_exif_data(match["file_path"], match["prompt"], match["negativePrompt"])
 
     # Match IDs from extracted_ids with upscaled_ids and print the result
-    if user_id:
-        matched_images, total_upscaled = match_ids(files_info, upscaled_images)
-        print(
-            f"Matched {len(matched_images)} of {len(extracted_ids)} out of {total_upscaled} upscaled images"
-        )
+    # if user_id:
+    #     matched_images, total_upscaled = match_ids(files_info, upscaled_images)
+    #     print(
+    #         f"Matched {len(matched_images)} of {len(extracted_ids)} out of {total_upscaled} upscaled images"
+    #     )
 
-        # Update EXIF data for matched images
-        for match in matched_images:
-            update_exif_data(
-                match["file_path"], match["prompt"], match["negativePrompt"]
-            )
+    #     # Update EXIF data for matched images
+    #     for match in matched_images:
+    #         update_exif_data(
+    #             match["file_path"], match["prompt"], match["negativePrompt"]
+    #         )
